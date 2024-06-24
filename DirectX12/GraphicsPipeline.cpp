@@ -59,7 +59,7 @@ void GraphicsPipeline::LoadPipeline(const UINT& WidthIn, const UINT& HeightIn)
 
 #pragma region Debug Layer
 #ifdef _DEBUG
-    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&DebugController))))
+    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(DebugController.GetAddressOf()))))
     {
         DebugController->EnableDebugLayer();
     }
@@ -68,15 +68,15 @@ void GraphicsPipeline::LoadPipeline(const UINT& WidthIn, const UINT& HeightIn)
        
 #pragma region Device
     ComPtr<IDXGIFactory4> Factory;
-    ExitIfFailed(CREATE_DXGI_FACTORY_FAILED, CreateDXGIFactory1(IID_PPV_ARGS(&Factory)));
+    ExitIfFailed(CREATE_DXGI_FACTORY_FAILED, CreateDXGIFactory1(IID_PPV_ARGS(Factory.GetAddressOf())));
 
     ComPtr<IDXGIAdapter> WarpAdapter;
-    ExitIfFailed(GET_WARP_ADAPTER_FAILED, Factory->EnumWarpAdapter(IID_PPV_ARGS(&WarpAdapter)));
+    ExitIfFailed(GET_WARP_ADAPTER_FAILED, Factory->EnumWarpAdapter(IID_PPV_ARGS(WarpAdapter.GetAddressOf())));
 
     ExitIfFailed(CREATE_DEVICE_FAILED, D3D12CreateDevice(
         WarpAdapter.Get(),
         D3D_FEATURE_LEVEL_11_0,
-        IID_PPV_ARGS(&Device)
+        IID_PPV_ARGS(Device.GetAddressOf())
     ));
 #pragma endregion
 
@@ -86,11 +86,11 @@ void GraphicsPipeline::LoadPipeline(const UINT& WidthIn, const UINT& HeightIn)
     CommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     CommandQueueDesc.Type = CommandListType;
 
-    ExitIfFailed(CREATE_COMMAND_QUEUE_FAILED, Device->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(&CommandQueue)));
+    ExitIfFailed(CREATE_COMMAND_QUEUE_FAILED, Device->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(CommandQueue.GetAddressOf())));
 #pragma endregion
 
 #pragma region Command Allocator
-    ExitIfFailed(CREATE_COMMAND_ALLOCATOR_FAILED, Device->CreateCommandAllocator(CommandListType, IID_PPV_ARGS(&CommandAllocator)));
+    ExitIfFailed(CREATE_COMMAND_ALLOCATOR_FAILED, Device->CreateCommandAllocator(CommandListType, IID_PPV_ARGS(CommandAllocator.GetAddressOf())));
 #pragma endregion
 
 #pragma region Swapchain
@@ -121,7 +121,7 @@ void GraphicsPipeline::LoadPipeline(const UINT& WidthIn, const UINT& HeightIn)
     HeapDesc.NumDescriptors = BackBufferCount;
     HeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     HeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    ExitIfFailed(CREATE_HEAP_DESCRIPTOR_FAILED, Device->CreateDescriptorHeap(&HeapDesc, IID_PPV_ARGS(&RTVHeapDescriptor)));
+    ExitIfFailed(CREATE_HEAP_DESCRIPTOR_FAILED, Device->CreateDescriptorHeap(&HeapDesc, IID_PPV_ARGS(RTVHeapDescriptor.GetAddressOf())));
 #pragma endregion
 
 #pragma region Render Target View
@@ -166,7 +166,10 @@ void GraphicsPipeline::LoadAsset()
     ComPtr<ID3DBlob> signature;
     ComPtr<ID3DBlob> error;
     ExitIfFailed(CREATE_ROOT_SIGNATURE_FAILED, D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
-    ExitIfFailed(CREATE_ROOT_SIGNATURE_FAILED, Device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&RootSignature)));
+    ExitIfFailed(CREATE_ROOT_SIGNATURE_FAILED, Device->CreateRootSignature(
+        0, signature->GetBufferPointer(), signature->GetBufferSize(),
+        IID_PPV_ARGS(RootSignature.GetAddressOf()))
+    );
 #pragma endregion
 
 #pragma region Pipeline
@@ -212,11 +215,14 @@ void GraphicsPipeline::LoadAsset()
     PSODesc.NumRenderTargets = 1;
     PSODesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
     PSODesc.SampleDesc.Count = 1;
-    ExitIfFailed(CREATE_PSO_FAILED, Device->CreateGraphicsPipelineState(&PSODesc, IID_PPV_ARGS(&PipelineState)));
+    ExitIfFailed(CREATE_PSO_FAILED, Device->CreateGraphicsPipelineState(&PSODesc, IID_PPV_ARGS(PipelineState.GetAddressOf())));
 #pragma endregion
 
 #pragma region Command List
-    ExitIfFailed(CREATE_COMMAND_LIST_FAILED, Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandAllocator.Get(), PipelineState.Get(), IID_PPV_ARGS(&CommandList)));
+    ExitIfFailed(CREATE_COMMAND_LIST_FAILED, Device->CreateCommandList(
+        0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandAllocator.Get(),
+        PipelineState.Get(), IID_PPV_ARGS(CommandList.GetAddressOf()))
+    );
     ExitIfFailed(CLOSE_COMMAND_LIST_FAILED, CommandList->Close());
 #pragma endregion
 
@@ -239,7 +245,7 @@ void GraphicsPipeline::LoadAsset()
         &Desc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&VertexBuffer))
+        IID_PPV_ARGS(VertexBuffer.GetAddressOf()))
     );
 
     // Copy the triangle data to the vertex buffer.
@@ -257,7 +263,7 @@ void GraphicsPipeline::LoadAsset()
 #pragma endregion
 
 #pragma region Synchronization Object
-    ExitIfFailed(CREATE_FENCE_FAILED, Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&Fence)));
+    ExitIfFailed(CREATE_FENCE_FAILED, Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(Fence.GetAddressOf())));
     FenceValue = 1;
 
     // Create an event handle to use for frame synchronization.
@@ -287,24 +293,17 @@ void GraphicsPipeline::OnRender()
 
 void GraphicsPipeline::PopulateCommandList()
 {
-    // Command list allocators can only be reset when the associated 
-// command lists have finished execution on the GPU; apps should use 
-// fences to determine GPU execution progress.
     ExitIfFailed(RESET_COMMAND_FAILED, CommandAllocator->Reset());
-
-    // However, when ExecuteCommandList() is called on a particular command 
-    // list, that command list can then be reset at any time and must be before 
-    // re-recording.
     ExitIfFailed(RESET_COMMAND_FAILED, CommandList->Reset(CommandAllocator.Get(), PipelineState.Get()));
 
-    // Set necessary state.
     CommandList->SetGraphicsRootSignature(RootSignature.Get());
-    //CommandList->RSSetViewports(1, &m_viewport);
-    //CommandList->RSSetScissorRects(1, &m_scissorRect);
 
-    // Indicate that the back buffer will be used as a render target.
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(RenderTargets[FrameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
-    CommandList->ResourceBarrier(1, &barrier);
+    CD3DX12_RESOURCE_BARRIER Barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        RenderTargets[FrameIndex].Get(),
+        D3D12_RESOURCE_STATE_PRESENT, 
+        D3D12_RESOURCE_STATE_RENDER_TARGET
+    );
+    CommandList->ResourceBarrier(1, &Barrier);
 
     CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(RTVHeapDescriptor->GetCPUDescriptorHandleForHeapStart(), FrameIndex, RTVDescriptorSize);
     CommandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
@@ -317,8 +316,12 @@ void GraphicsPipeline::PopulateCommandList()
     CommandList->DrawInstanced(3, 1, 0, 0);
 
     // Indicate that the back buffer will now be used to present.
-    barrier = CD3DX12_RESOURCE_BARRIER::Transition(RenderTargets[FrameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
-    CommandList->ResourceBarrier(1, &barrier);
+    Barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        RenderTargets[FrameIndex].Get(),
+        D3D12_RESOURCE_STATE_RENDER_TARGET, 
+        D3D12_RESOURCE_STATE_PRESENT
+    );
+    CommandList->ResourceBarrier(1, &Barrier);
 
     ExitIfFailed(RESET_COMMAND_FAILED, CommandList->Close());
 }

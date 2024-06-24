@@ -43,3 +43,11 @@ XMMATRIX Viewable::GetPerspectiveViewMatrix()
 	return XMMatrixLookToLH(Position.Position, CurrentForward, CurrentUp) *
 		XMMatrixPerspectiveFovLH(XMConvertToRadians(FovAngle), Width / Height, NearZ, FarZ);
 }
+
+void Viewable::UpdateView()
+{
+	ViewBuffer.CPUData.ViewMatrix = GetPerspectiveViewMatrix();
+	ViewBuffer.CPUData.InvViewMatrix = XMMatrixInverse(nullptr, ViewBuffer.CPUData.ViewMatrix);
+	ViewBuffer.CPUData.ViewMatrix = XMMatrixTranspose(ViewBuffer.CPUData.ViewMatrix);
+	ViewBuffer.Upload();
+}

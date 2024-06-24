@@ -131,6 +131,9 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="RTVObject.cpp" />
+    <ClCompile Include="SRVObject.cpp" />
+    <ClCompile Include="Texture2DObject.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="GlobalVariable.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
@@ -144,6 +147,9 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DefineUtility.h" />
     <ClInclude Include="DefineErrorCode.h" />
+    <ClInclude Include="RTVObject.h" />
+    <ClInclude Include="SRVObject.h" />
+    <ClInclude Include="Texture2DObject.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="GlobalVariable.h" />
     <ClInclude Include="GraphicsPipeline.h" />

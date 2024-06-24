@@ -1,11 +1,11 @@
 #pragma once
 #include "IBuffer.h"
 
-template<typename T>
+template<D3D12_RESOURCE_STATES ResourceState, typename T>
 class UploadBuffer : public IBuffer<T>
 {
 public:
-	UploadBuffer(D3D12_RESOURCE_STATES ResourceState);
+	UploadBuffer();
 	virtual ~UploadBuffer();
 
 public:
@@ -23,12 +23,12 @@ protected:
 	CD3DX12_RESOURCE_DESC ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(CPUData));
 
 public:
-	virtual void Upload(const T& UploadData) override;
+	virtual void Upload() override;
 	virtual void Download() override;
 };
 
-template<typename T>
-inline UploadBuffer<T>::UploadBuffer(D3D12_RESOURCE_STATES ResourceState)
+template<D3D12_RESOURCE_STATES ResourceState, typename T>
+inline UploadBuffer<ResourceState, T>::UploadBuffer()
 {
 	GraphicsPipeline::GPipeline->Device->CreateCommittedResource(
 		&HeapProperties,
@@ -36,7 +36,7 @@ inline UploadBuffer<T>::UploadBuffer(D3D12_RESOURCE_STATES ResourceState)
 		&ResourceDesc,
 		ResourceState,
 		nullptr,
-		IID_PPV_ARGS(&GPUData)
+		IID_PPV_ARGS(GPUData.GetAddressOf())
 	);
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC CBVDesc;
@@ -49,13 +49,13 @@ inline UploadBuffer<T>::UploadBuffer(D3D12_RESOURCE_STATES ResourceState)
 	);
 }
 
-template<typename T>
-inline UploadBuffer<T>::~UploadBuffer()
+template<D3D12_RESOURCE_STATES ResourceState, typename T>
+inline UploadBuffer<ResourceState, T>::~UploadBuffer()
 {
 }
 
-template<typename T>
-inline void UploadBuffer<T>::Upload(const T& UploadData)
+template<D3D12_RESOURCE_STATES ResourceState, typename T>
+inline void UploadBuffer<ResourceState, T>::Upload()
 {
 	UINT8* pCBVDataBegin = nullptr;
 	CD3DX12_RANGE ReadRange(0, 0);
@@ -65,7 +65,7 @@ inline void UploadBuffer<T>::Upload(const T& UploadData)
 	GPUData->Unmap(0, nullptr);
 }
 
-template<typename T>
-inline void UploadBuffer<T>::Download()
+template<D3D12_RESOURCE_STATES ResourceState, typename T>
+inline void UploadBuffer<ResourceState, T>::Download()
 {
 }

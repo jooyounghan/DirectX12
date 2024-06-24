@@ -12,6 +12,6 @@ template<typename T>
 class IBuffer
 {
 public:
-	virtual void Upload(const T& UploadData) = 0;
+	virtual void Upload() = 0;
 	virtual void Download() = 0;
 };

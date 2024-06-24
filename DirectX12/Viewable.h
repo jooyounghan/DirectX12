@@ -1,6 +1,12 @@
 #pragma once
 #include "Object.h"
-#include <d3d12.h>
+#include "UploadBuffer.h"
+ 
+struct ViewBufferData
+{
+	DirectX::XMMATRIX ViewMatrix;
+	DirectX::XMMATRIX InvViewMatrix;
+};
 
 class Viewable : public Object
 {
@@ -27,5 +33,11 @@ protected:
 public:
 	virtual void Resize(const float& WidthIn, const float& HeightIn);
 	DirectX::XMMATRIX GetPerspectiveViewMatrix();
+
+public:
+	UploadBuffer<D3D12_RESOURCE_STATE_COPY_DEST, ViewBufferData> ViewBuffer;
+
+public:
+	void UpdateView();
 };
 
