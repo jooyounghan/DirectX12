@@ -129,17 +129,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="GlobalVariable.cpp" />
     <ClCompile Include="GraphicsPipeline.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="PortfolioApp.cpp" />
+    <ClCompile Include="Viewable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DefineUtility.h" />
     <ClInclude Include="DefineErrorCode.h" />
+    <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="GlobalVariable.h" />
     <ClInclude Include="GraphicsPipeline.h" />
+    <ClInclude Include="HeaderHelper.h" />
+    <ClInclude Include="IBuffer.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="PortfolioApp.h" />
+    <ClInclude Include="Viewable.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\BasePS.hlsl">

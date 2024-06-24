@@ -4,10 +4,6 @@
 #include "DefineUtility.h"
 #include "DefineErrorCode.h"
 
-#include <iostream>
-#include <filesystem>
-#include <shlobj.h>
-
 using namespace std;
 
 PortfolioApp* PortfolioApp::GApp = nullptr;
@@ -45,49 +41,13 @@ PortfolioApp::PortfolioApp()
 	AutoZeroMemory(MonitorInfo);
 	MonitorInfo.cbSize = sizeof(MONITORINFO);
 
-	if (GetMonitorInfoA(Monitor, &MonitorInfo))
-	{
-		Width = MonitorInfo.rcWork.right - MonitorInfo.rcWork.left;
-		Height = MonitorInfo.rcWork.bottom - MonitorInfo.rcWork.top;
-	}
-	else
-	{
-		cerr << "Getting Monitor Information Failed" << endl;
-		exit(MONITOR_INFORMATION_ERROR);
-	}
+	ExitIfFailed(MONITOR_INFORMATION_ERROR, GetMonitorInfoA(Monitor, &MonitorInfo));
+
+	Width = MonitorInfo.rcWork.right - MonitorInfo.rcWork.left;
+	Height = MonitorInfo.rcWork.bottom - MonitorInfo.rcWork.top;
 
 	SetWindowPos(MainWindow, NULL, 0, 0, Width, Height, SWP_SHOWWINDOW | SWP_NOMOVE);
 	UpdateWindow(MainWindow);
-
-
-	// TODO : 구조에 맞게 변경
-	if (GetModuleHandle(L"WinPixGpuCapturer.dll") == 0)
-	{
-		LoadLibrary(GetLatestWinPixGpuCapturerPath().c_str());
-	}
-
-	GraphicsPipelineInstance = make_unique<GraphicsPipeline>();
-	GraphicsPipelineInstance->LoadPipeline(Width, Height);
-
-	// TODO : 구조에 맞게 변경
-	if (GetModuleHandle(L"WinPixGpuCapturer.dll") == 0)
-	{
-		LoadLibrary(GetLatestWinPixGpuCapturerPath().c_str());
-	}
-
-	GraphicsPipelineInstance->LoadAsset();
-
-	GraphicsPipelineInstance->m_viewport.Width = Width;
-	GraphicsPipelineInstance->m_viewport.Height = Height;
-	GraphicsPipelineInstance->m_viewport.MinDepth = 0.0f;
-	GraphicsPipelineInstance->m_viewport.MaxDepth = 1.0f;
-
-	GraphicsPipelineInstance->m_scissorRect.right = Width;
-	GraphicsPipelineInstance->m_scissorRect.bottom = Height;
-	while (true)
-	{
-		GraphicsPipelineInstance->OnRender();
-	}
 }
 
 PortfolioApp::~PortfolioApp()
@@ -98,7 +58,17 @@ PortfolioApp::~PortfolioApp()
 
 void PortfolioApp::Init()
 {
+	GraphicsPipelineInstance = make_unique<GraphicsPipeline>();
+	GraphicsPipelineInstance->LoadPipeline(Width, Height);
 
+	
+
+	GraphicsPipelineInstance->LoadAsset();
+
+	while (true)
+	{
+		GraphicsPipelineInstance->OnRender();
+	}
 }
 
 void PortfolioApp::Update(const float& fDelta)
@@ -115,32 +85,4 @@ void PortfolioApp::Run()
 
 void PortfolioApp::Quit()
 {
-}
-
-std::wstring PortfolioApp::GetLatestWinPixGpuCapturerPath()
-{
-	LPWSTR programFilesPath = nullptr;
-	SHGetKnownFolderPath(FOLDERID_ProgramFiles, KF_FLAG_DEFAULT, NULL, &programFilesPath);
-	filesystem::path pixInstallationPath = programFilesPath;
-	pixInstallationPath /= "Microsoft PIX";
-
-	std::wstring newestVersionFound;
-
-	for (auto const& directory_entry : std::filesystem::directory_iterator(pixInstallationPath))
-	{
-		if (directory_entry.is_directory())
-		{
-			if (newestVersionFound.empty() || newestVersionFound < directory_entry.path().filename().c_str())
-			{
-				newestVersionFound = directory_entry.path().filename().c_str();
-			}
-		}
-	}
-
-	if (newestVersionFound.empty())
-	{
-		// TODO: Error, no PIX installation found
-	}
-
-	return pixInstallationPath / newestVersionFound / L"WinPixGpuCapturer.dll";
 }

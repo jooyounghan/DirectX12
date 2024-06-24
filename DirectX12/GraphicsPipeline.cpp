@@ -1,14 +1,12 @@
 #include "GraphicsPipeline.h"
 #include "GlobalVariable.h"
 #include "DefineErrorCode.h"
+#include "DefineUtility.h"
 
-#include <d3d12.h>
-#include <d3d12sdklayers.h>
-#include <dxgi1_4.h>
-#include <d3dcompiler.h>
+#include <filesystem>
+#include <shlobj.h>
 
-#include "directx/d3dx12.h"
-
+using namespace std;
 using namespace Microsoft::WRL;
 
 GraphicsPipeline* GraphicsPipeline::GPipeline = nullptr;
@@ -22,9 +20,42 @@ GraphicsPipeline::~GraphicsPipeline()
 {
 }
 
-void GraphicsPipeline::LoadPipeline(const UINT& Width, const UINT& Height)
+std::wstring GraphicsPipeline::GetLatestWinPixGpuCapturerPath()
 {
-    SetAspectRatio(static_cast<float>(Width) / Height);
+    LPWSTR programFilesPath = nullptr;
+    SHGetKnownFolderPath(FOLDERID_ProgramFiles, KF_FLAG_DEFAULT, NULL, &programFilesPath);
+    filesystem::path pixInstallationPath = programFilesPath;
+    pixInstallationPath /= "Microsoft PIX";
+
+    std::wstring newestVersionFound;
+
+    for (auto const& directory_entry : std::filesystem::directory_iterator(pixInstallationPath))
+    {
+        if (directory_entry.is_directory())
+        {
+            if (newestVersionFound.empty() || newestVersionFound < directory_entry.path().filename().c_str())
+            {
+                newestVersionFound = directory_entry.path().filename().c_str();
+            }
+        }
+    }
+
+    if (newestVersionFound.empty())
+    {
+        // TODO: Error, no PIX installation found
+    }
+
+    return pixInstallationPath / newestVersionFound / L"WinPixGpuCapturer.dll";
+}
+
+void GraphicsPipeline::LoadPipeline(const UINT& WidthIn, const UINT& HeightIn)
+{
+    SetAspectRatio(static_cast<float>(WidthIn) / HeightIn);
+
+    if (GetModuleHandle(L"WinPixGpuCapturer.dll") == 0)
+    {
+        LoadLibrary(GetLatestWinPixGpuCapturerPath().c_str());
+    }
 
 #pragma region Debug Layer
 #ifdef _DEBUG
@@ -53,17 +84,21 @@ void GraphicsPipeline::LoadPipeline(const UINT& Width, const UINT& Height)
     D3D12_COMMAND_QUEUE_DESC CommandQueueDesc;
     AutoZeroMemory(CommandQueueDesc);
     CommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-    CommandQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    CommandQueueDesc.Type = CommandListType;
 
     ExitIfFailed(CREATE_COMMAND_QUEUE_FAILED, Device->CreateCommandQueue(&CommandQueueDesc, IID_PPV_ARGS(&CommandQueue)));
+#pragma endregion
+
+#pragma region Command Allocator
+    ExitIfFailed(CREATE_COMMAND_ALLOCATOR_FAILED, Device->CreateCommandAllocator(CommandListType, IID_PPV_ARGS(&CommandAllocator)));
 #pragma endregion
 
 #pragma region Swapchain
     DXGI_SWAP_CHAIN_DESC SwapChainDesc;
     AutoZeroMemory(SwapChainDesc);
     SwapChainDesc.BufferCount = BackBufferCount;
-    SwapChainDesc.BufferDesc.Width = Width;
-    SwapChainDesc.BufferDesc.Height = Height;
+    SwapChainDesc.BufferDesc.Width = WidthIn;
+    SwapChainDesc.BufferDesc.Height = HeightIn;
     SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
@@ -92,17 +127,12 @@ void GraphicsPipeline::LoadPipeline(const UINT& Width, const UINT& Height)
 #pragma region Render Target View
     RTVDescriptorSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
     CD3DX12_CPU_DESCRIPTOR_HANDLE RTVHandle(RTVHeapDescriptor->GetCPUDescriptorHandleForHeapStart());
-    // Create a RTV for each frame.
     for (UINT n = 0; n < BackBufferCount; n++)
     {
-        ExitIfFailed(GET_BUFFER_FROM_SWAPCHAIN_FAILED, SwapChain->GetBuffer(n, IID_PPV_ARGS(&RenderTargets[n])));
+        ExitIfFailed(GET_BUFFER_FROM_SWAPCHAIN_FAILED, SwapChain->GetBuffer(n, IID_PPV_ARGS(RenderTargets[n].GetAddressOf())));
         Device->CreateRenderTargetView(RenderTargets[n].Get(), nullptr, RTVHandle);
         RTVHandle.Offset(1, RTVDescriptorSize);
     }
-#pragma endregion
-
-#pragma region Command Allocator
-    ExitIfFailed(CREATE_COMMAND_ALLOCATOR_FAILED, Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&CommandAllocator)));
 #pragma endregion
 }
 
@@ -236,7 +266,6 @@ void GraphicsPipeline::LoadAsset()
     {
         ExitIfFailed(CREATE_FENCE_FAILED, HRESULT_FROM_WIN32(GetLastError()));
     }
-
     WaitForPreviousFrame();
 #pragma endregion
 }
@@ -270,8 +299,8 @@ void GraphicsPipeline::PopulateCommandList()
 
     // Set necessary state.
     CommandList->SetGraphicsRootSignature(RootSignature.Get());
-    CommandList->RSSetViewports(1, &m_viewport);
-    CommandList->RSSetScissorRects(1, &m_scissorRect);
+    //CommandList->RSSetViewports(1, &m_viewport);
+    //CommandList->RSSetScissorRects(1, &m_scissorRect);
 
     // Indicate that the back buffer will be used as a render target.
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(RenderTargets[FrameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);

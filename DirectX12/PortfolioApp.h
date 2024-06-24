@@ -4,7 +4,6 @@
 #include <windowsx.h>
 #include <wrl/client.h>
 #include <memory>
-#include <string>
 
 class GraphicsPipeline;
 
@@ -29,14 +28,15 @@ protected:
 	UINT Height;
 
 public:
-	virtual void Init();
-	virtual void Update(const float& fDelta);
-	virtual void Render();
-	virtual void Run();
-	virtual void Quit();
+	void Init();
+	void Run();
+
+protected:
+	void Update(const float& fDelta);
+	void Render();
 
 public:
-	std::wstring GetLatestWinPixGpuCapturerPath();
+	void Quit();
 
 public:
 	inline LRESULT WINAPI AppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { return ::DefWindowProc(hWnd, msg, wParam, lParam); }

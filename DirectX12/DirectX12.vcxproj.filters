@@ -25,6 +25,30 @@
     <Filter Include="소스 파일\Shaders">
       <UniqueIdentifier>{37384753-23e8-40b5-a2ef-f7b99a60a0d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Object">
+      <UniqueIdentifier>{5090f31e-885c-42e4-bab8-1ca492321af0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Object">
+      <UniqueIdentifier>{9ddf5e44-37d4-4847-bbdb-24836ae8a434}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\View">
+      <UniqueIdentifier>{6228785a-676d-4fa2-b970-4f6c9b18e1e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\View">
+      <UniqueIdentifier>{6a148344-0268-4c0a-829a-15a5afdbe8fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Buffer">
+      <UniqueIdentifier>{01d3db1e-4862-4af0-a49b-a79d20e3fe80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Buffer">
+      <UniqueIdentifier>{e41ed7b9-ee58-4bbb-b4dc-1e6bcae99985}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Buffer\Extended">
+      <UniqueIdentifier>{836a1541-8b89-4742-9284-a45251b65076}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Buffer\Extended">
+      <UniqueIdentifier>{a70ccf54-19e5-4413-b103-728b28293d51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,6 +62,21 @@
     </ClCompile>
     <ClCompile Include="GraphicsPipeline.cpp">
       <Filter>소스 파일\App</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>소스 파일\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewable.cpp">
+      <Filter>소스 파일\View</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>소스 파일\View</Filter>
+    </ClCompile>
+    <ClCompile Include="UploadBuffer.cpp">
+      <Filter>소스 파일\Buffer\Extended</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>소스 파일\Buffer\Extended</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +94,27 @@
     </ClInclude>
     <ClInclude Include="GraphicsPipeline.h">
       <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>헤더 파일\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderHelper.h">
+      <Filter>헤더 파일\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewable.h">
+      <Filter>헤더 파일\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>헤더 파일\View</Filter>
+    </ClInclude>
+    <ClInclude Include="IBuffer.h">
+      <Filter>헤더 파일\Buffer</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>헤더 파일\Buffer\Extended</Filter>
+    </ClInclude>
+    <ClInclude Include="UploadBuffer.h">
+      <Filter>헤더 파일\Buffer\Extended</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
