@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -120,19 +121,36 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d12.lib;directx-headers.lib;dxgi.lib;d3dcompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ConstantArrayBuffer.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="FrontEnd.cpp" />
+    <ClCompile Include="IDialog.cpp" />
+    <ClCompile Include="ImGui\imgui.cpp" />
+    <ClCompile Include="ImGui\imgui_demo.cpp" />
+    <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ImGui\imgui_tables.cpp" />
+    <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="RenderObject.cpp" />
+    <ClCompile Include="ResourceObject.cpp" />
     <ClCompile Include="RTVObject.cpp" />
     <ClCompile Include="SRVObject.cpp" />
+    <ClCompile Include="TaskAnalyzerDialog.cpp" />
     <ClCompile Include="Texture2DObject.cpp" />
     <ClCompile Include="UploadBuffer.cpp" />
     <ClCompile Include="GlobalVariable.cpp" />
@@ -141,14 +159,30 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PortfolioApp.cpp" />
     <ClCompile Include="Viewable.cpp" />
+    <ClCompile Include="ViewportDialog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="ConstantArrayBuffer.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DefineUtility.h" />
     <ClInclude Include="DefineErrorCode.h" />
+    <ClInclude Include="FrontEnd.h" />
+    <ClInclude Include="IDialog.h" />
+    <ClInclude Include="ImGui\imconfig.h" />
+    <ClInclude Include="ImGui\imgui.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx12.h" />
+    <ClInclude Include="ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\imstb_rectpack.h" />
+    <ClInclude Include="ImGui\imstb_textedit.h" />
+    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="RenderObject.h" />
+    <ClInclude Include="ResourceObject.h" />
     <ClInclude Include="RTVObject.h" />
     <ClInclude Include="SRVObject.h" />
+    <ClInclude Include="TaskAnalyzerDialog.h" />
     <ClInclude Include="Texture2DObject.h" />
     <ClInclude Include="UploadBuffer.h" />
     <ClInclude Include="GlobalVariable.h" />
@@ -158,6 +192,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="PortfolioApp.h" />
     <ClInclude Include="Viewable.h" />
+    <ClInclude Include="ViewportDialog.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\BasePS.hlsl">

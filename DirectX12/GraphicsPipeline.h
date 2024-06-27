@@ -9,30 +9,13 @@
 #include <d3d12sdklayers.h>
 #include <dxgi1_4.h>
 #include <d3dcompiler.h>
-#include <string>
+#include "d3dx12.h"
 
-#include "directx/d3dx12.h"
+#include<memory>
 
-struct Point
-{
-		float x;
-		float y;
-		float z;
-};
-
-struct Color
-{
-	float r;
-	float g;
-	float b;
-	float a;
-};
-
-struct Vertex
-{
-	Point PointValue;
-	Color ColorValue;
-};
+class Texture2DObject;
+class SRVObject;
+class RTVObject;
 
 class GraphicsPipeline
 {
@@ -46,17 +29,18 @@ public:
 public:
 	Microsoft::WRL::ComPtr<ID3D12Debug> DebugController;
 
-public:
+protected:
 	static const UINT BackBufferCount = 2;
+	UINT FrameIndex;
+	MakeSetterGetter(FrameIndex);
 
 public:
 	Microsoft::WRL::ComPtr<ID3D12Device> Device;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> SwapChain;
 	
 public:
-	Microsoft::WRL::ComPtr<ID3D12Resource> RenderTargets[BackBufferCount];
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> RTVHeapDescriptor;
-	UINT RTVDescriptorSize = 0;
+	std::unique_ptr<Texture2DObject>	BackBufferTextures[BackBufferCount];
+	std::unique_ptr<RTVObject>			BackBufferRTVs;
 
 public:
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> CommandAllocator;
@@ -69,6 +53,11 @@ public:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CommandList;
 
 protected:
+	HANDLE FenceEvent;
+	Microsoft::WRL::ComPtr<ID3D12Fence> Fence;
+	UINT64 FenceValue;
+
+protected:
 	float AspectRatio = 0.f;
 	MakeSetterGetter(AspectRatio);
 
@@ -78,19 +67,11 @@ protected:
 public:
 	void LoadPipeline(const UINT& WidthIn, const UINT& HeightIn);
 
-	// TODO : 구조에 맞게 변경
 public:
-	Microsoft::WRL::ComPtr<ID3D12Resource> VertexBuffer;
-	std::unique_ptr<D3D12_VERTEX_BUFFER_VIEW> VertexBufferView;
+	void PrepareRender();
+	void ExecuteRender();
 
-	UINT FrameIndex;
-	HANDLE FenceEvent;
-	Microsoft::WRL::ComPtr<ID3D12Fence> Fence;
-	UINT64 FenceValue;
-
+public:
 	void WaitForPreviousFrame();
-	void LoadAsset();
-	void OnRender();
-	void PopulateCommandList();
 };
 

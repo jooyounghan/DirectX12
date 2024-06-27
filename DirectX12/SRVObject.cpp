@@ -1,28 +1,28 @@
 #include "SRVObject.h"
 #include "GraphicsPipeline.h"
 #include "DefineUtility.h"
+#include "DefineErrorCode.h"
 
 SRVObject::SRVObject(
-    ID3D12Resource* pResource,
-    DXGI_FORMAT FormatIn,
-    D3D12_SRV_DIMENSION ViewDimensionIn,
-    UINT MipLevelsIn
+    ID3D12Device* Device,
+    UINT ResourceCount,
+    ID3D12Resource** Resources
 )
 {
-	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
-	AutoZeroMemory(SRVDesc);
+    D3D12_DESCRIPTOR_HEAP_DESC HeapDesc;
+    AutoZeroMemory(HeapDesc);
+    HeapDesc.NumDescriptors = ResourceCount;
+    HeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+    HeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    ExitIfFailed(CREATE_HEAP_DESCRIPTOR_FAILED, Device->CreateDescriptorHeap(&HeapDesc, IID_PPV_ARGS(HeapDescriptor.GetAddressOf())));
 
-    SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    SRVDesc.Format = FormatIn;
-    SRVDesc.ViewDimension = ViewDimensionIn;
-    SRVDesc.Texture2D.MostDetailedMip = 0;
-    SRVDesc.Texture2D.MipLevels = MipLevelsIn;
-    SRVDesc.Texture2D.PlaneSlice = 0;
-    SRVDesc.Texture2D.ResourceMinLODClamp = 0.0f;
-
-	GraphicsPipeline::GPipeline->Device->CreateShaderResourceView(
-        pResource, &SRVDesc, SRVHandle
-    );
+    SRVDescriptorSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+    CD3DX12_CPU_DESCRIPTOR_HANDLE SRVHandle(HeapDescriptor->GetCPUDescriptorHandleForHeapStart());
+    for (UINT n = 0; n < ResourceCount; n++)
+    {
+        Device->CreateShaderResourceView(Resources[n], nullptr, SRVHandle);
+        SRVHandle.Offset(1, SRVDescriptorSize);
+    }
 }
 
 SRVObject::~SRVObject()

@@ -11,7 +11,7 @@ struct ViewBufferData
 class Viewable : public Object
 {
 public:
-	Viewable(const float& WidthIn, const float& HeightIn);
+	Viewable(ID3D12Device* Device, const float& WidthIn, const float& HeightIn);
 	virtual ~Viewable();
 
 protected:
@@ -35,7 +35,7 @@ public:
 	DirectX::XMMATRIX GetPerspectiveViewMatrix();
 
 public:
-	UploadBuffer<D3D12_RESOURCE_STATE_COPY_DEST, ViewBufferData> ViewBuffer;
+	UploadBuffer<ViewBufferData> ViewBuffer;
 
 public:
 	void UpdateView();

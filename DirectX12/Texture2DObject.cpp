@@ -2,8 +2,7 @@
 #include "DefineUtility.h"
 #include "DefineErrorCode.h"
 #include "GraphicsPipeline.h"
-
-#include "directx/d3dx12.h"
+#include "d3dx12.h"
 
 Texture2DObject::Texture2DObject(
 	const UINT64 WidthIn,
@@ -14,6 +13,7 @@ Texture2DObject::Texture2DObject(
 	bool IsMultiSampled,
 	D3D12_RESOURCE_FLAGS ResourceFlagsIn
 )
+	: ResourceObject(D3D12_RESOURCE_STATE_COMMON)
 {
 	MipLevel = MipLevelIn;
 	Format = FormatIn;
@@ -61,10 +61,20 @@ Texture2DObject::Texture2DObject(
 		&HeapProps,
 		D3D12_HEAP_FLAG_NONE,
 		&TextureDesc,
-		D3D12_RESOURCE_STATE_COMMON,
+		CurrentState,
 		&ClearValue,
-		IID_PPV_ARGS(Texture2DResource.GetAddressOf()))
+		IID_PPV_ARGS(Resource.GetAddressOf()))
 	);
+}
+
+Texture2DObject::Texture2DObject(const Microsoft::WRL::ComPtr<ID3D12Resource>& ResourceIn)
+	: ResourceObject(D3D12_RESOURCE_STATE_COMMON)
+{
+	ExitIfFailed(COM_PTR_AS_FAILED, ResourceIn.As(&Resource));
+	D3D12_RESOURCE_DESC ResourceDesc = Resource->GetDesc();
+	MipLevel = ResourceDesc.MipLevels;
+	Format = ResourceDesc.Format;
+	SetDimension(ResourceDesc.DepthOrArraySize, ResourceDesc.SampleDesc.Count > 1);
 }
 
 Texture2DObject::~Texture2DObject()
@@ -77,7 +87,7 @@ void Texture2DObject::SetDimension(const UINT& ArraySizeIn, bool IsMultiSampled)
 	{
 		SRVDimension = D3D12_SRV_DIMENSION_TEXTURE2DMSARRAY;
 		RTVDimension = D3D12_RTV_DIMENSION_TEXTURE2DMSARRAY;
-		UAVDimension = D3D12_UAV_DIMENSION_TEXTURE2DMSARRAY;
+		UAVDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
 	}
 	else if (ArraySizeIn > 1)
 	{
@@ -89,7 +99,7 @@ void Texture2DObject::SetDimension(const UINT& ArraySizeIn, bool IsMultiSampled)
 	{
 		SRVDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
 		RTVDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS;
-		UAVDimension = D3D12_UAV_DIMENSION_TEXTURE2DMS;
+		UAVDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 	}
 	else
 	{

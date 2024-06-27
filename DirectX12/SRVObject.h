@@ -2,21 +2,19 @@
 #include <windows.h>
 #include <wrl/client.h>
 #include <d3d12.h>
-#include "directx/d3dx12.h"
 
 class SRVObject
 {
 public:
 	SRVObject(
-		ID3D12Resource* pResource, 
-		DXGI_FORMAT FormatIn,
-		D3D12_SRV_DIMENSION ViewDimensionIn,
-		UINT MipLevelsIn
+		ID3D12Device* Device,
+		UINT ResourceCount,
+		ID3D12Resource** Resources
 	);
 	~SRVObject();
 
 public:
-	D3D12_CPU_DESCRIPTOR_HANDLE SRVHandle;
-
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> HeapDescriptor;
+	UINT SRVDescriptorSize = 0;
 };
 

@@ -1,71 +1,85 @@
 #pragma once
 #include "IBuffer.h"
+#include "ResourceObject.h"
 
-template<D3D12_RESOURCE_STATES ResourceState, typename T>
+template<typename T>
 class UploadBuffer : public IBuffer<T>
 {
 public:
-	UploadBuffer();
+	UploadBuffer(ID3D12Device* Device);
 	virtual ~UploadBuffer();
 
 public:
 	alignas(256) T CPUData;
 
 protected:
-	Microsoft::WRL::ComPtr<ID3D12Resource> GPUData;
+	ResourceObject GPUData;
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CBVHeapDescriptor;
 
 public:
-	inline D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress() { return GPUData->GetGPUVirtualAddress(); }
+	virtual size_t GetBufferSize() override;
+	virtual D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress() override;
 
 protected:
 	CD3DX12_HEAP_PROPERTIES HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	CD3DX12_RESOURCE_DESC ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(CPUData));
+	CD3DX12_RESOURCE_DESC ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(GetBufferSize());
 
 public:
 	virtual void Upload() override;
 	virtual void Download() override;
 };
 
-template<D3D12_RESOURCE_STATES ResourceState, typename T>
-inline UploadBuffer<ResourceState, T>::UploadBuffer()
+template<typename T>
+inline UploadBuffer<T>::UploadBuffer(ID3D12Device* Device)
+	: IBuffer<T>(), CPUData(), GPUData(D3D12_RESOURCE_STATE_GENERIC_READ)
 {
-	GraphicsPipeline::GPipeline->Device->CreateCommittedResource(
+	Device->CreateCommittedResource(
 		&HeapProperties,
 		D3D12_HEAP_FLAG_NONE,
 		&ResourceDesc,
-		ResourceState,
+		GPUData.GetCurrentState(),
 		nullptr,
-		IID_PPV_ARGS(GPUData.GetAddressOf())
+		IID_PPV_ARGS(GPUData.Resource.GetAddressOf())
 	);
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC CBVDesc;
 	AutoZeroMemory(CBVDesc);
-	CBVDesc.BufferLocation = GPUData->GetGPUVirtualAddress();
-	CBVDesc.SizeInBytes = sizeof(CPUData);
+	CBVDesc.BufferLocation = GPUData.Resource->GetGPUVirtualAddress();
+	CBVDesc.SizeInBytes = GetBufferSize();
 
-	GraphicsPipeline::GPipeline->Device->CreateConstantBufferView(
+	Device->CreateConstantBufferView(
 		&CBVDesc, CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
 	);
 }
 
-template<D3D12_RESOURCE_STATES ResourceState, typename T>
-inline UploadBuffer<ResourceState, T>::~UploadBuffer()
+template<typename T>
+inline UploadBuffer<T>::~UploadBuffer()
 {
 }
 
-template<D3D12_RESOURCE_STATES ResourceState, typename T>
-inline void UploadBuffer<ResourceState, T>::Upload()
+template<typename T>
+inline size_t UploadBuffer<T>::GetBufferSize()
 {
-	UINT8* pCBVDataBegin = nullptr;
+	return sizeof(CPUData);
+}
+
+template<typename T>
+inline D3D12_GPU_VIRTUAL_ADDRESS UploadBuffer<T>::GetBufferAddress() 
+{
+	return GPUData.Resource->GetGPUVirtualAddress(); 
+}
+
+template<typename T>
+inline void UploadBuffer<T>::Upload()
+{
+	UINT8* pConstantBufferView = nullptr;
 	CD3DX12_RANGE ReadRange(0, 0);
-
-	GPUData->Map(0, &ReadRange, reinterpret_cast<void**>(&pCBVDataBegin));
-	memcpy(pCBVDataBegin, CPUData.Get(), sizeof(CPUData));
-	GPUData->Unmap(0, nullptr);
+	GPUData.Resource->Map(0, &ReadRange, reinterpret_cast<void**>(&pConstantBufferView));
+	memcpy(pConstantBufferView, &CPUData, GetBufferSize());
+	GPUData.Resource->Unmap(0, nullptr);
 }
 
-template<D3D12_RESOURCE_STATES ResourceState, typename T>
-inline void UploadBuffer<ResourceState, T>::Download()
+template<typename T>
+inline void UploadBuffer<T>::Download()
 {
 }

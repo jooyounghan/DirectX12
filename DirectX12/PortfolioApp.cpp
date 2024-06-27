@@ -3,6 +3,7 @@
 #include "GraphicsPipeline.h"
 #include "DefineUtility.h"
 #include "DefineErrorCode.h"
+#include "FrontEnd.h"
 
 using namespace std;
 
@@ -61,28 +62,61 @@ void PortfolioApp::Init()
 	GraphicsPipelineInstance = make_unique<GraphicsPipeline>();
 	GraphicsPipelineInstance->LoadPipeline(Width, Height);
 
-	
-
-	GraphicsPipelineInstance->LoadAsset();
-
-	while (true)
-	{
-		GraphicsPipelineInstance->OnRender();
-	}
-}
-
-void PortfolioApp::Update(const float& fDelta)
-{
+	FrontEndInstance = make_unique<FrontEnd>(GraphicsPipelineInstance->Device.Get());
+	FrontEndInstance->Init(MainWindow);
 }
 
 void PortfolioApp::Render()
 {
+	const UINT& FrameIndex = GraphicsPipelineInstance->GetFrameIndex();
+
+	GraphicsPipelineInstance->PrepareRender();
+
+	FrontEndInstance->Render(
+		FrameIndex,
+		GraphicsPipelineInstance->BackBufferTextures[FrameIndex].get(),
+		GraphicsPipelineInstance->BackBufferRTVs.get(),
+		GraphicsPipelineInstance->CommandList.Get()
+	);
+
+	GraphicsPipelineInstance->ExecuteRender();
+
 }
 
 void PortfolioApp::Run()
 {
+	// Main message loop
+	MSG msg = {};
+	while (WM_QUIT != msg.message) 
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) 
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else 
+		{
+			Render();
+		}
+	}
 }
 
 void PortfolioApp::Quit()
 {
+}
+
+
+LRESULT __stdcall PortfolioApp::AppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	if (FrontEndInstance.get() && FrontEndInstance->FrontEndProc(hWnd, msg, wParam, lParam))
+		return true;
+
+	switch (msg) 
+	{
+	case WM_SIZE:
+		return 0;
+	case WM_EXITSIZEMOVE:
+		return 0;
+	}
+	return ::DefWindowProc(hWnd, msg, wParam, lParam);
 }

@@ -6,6 +6,7 @@
 #include <memory>
 
 class GraphicsPipeline;
+class FrontEnd;
 
 class PortfolioApp
 {
@@ -21,7 +22,8 @@ protected:
 	HWND MainWindow;
 
 protected:
-	std::unique_ptr<GraphicsPipeline> GraphicsPipelineInstance;
+	std::unique_ptr<GraphicsPipeline>	GraphicsPipelineInstance;
+	std::unique_ptr<FrontEnd>			FrontEndInstance;
 
 protected:
 	UINT Width;
@@ -32,13 +34,12 @@ public:
 	void Run();
 
 protected:
-	void Update(const float& fDelta);
 	void Render();
 
 public:
 	void Quit();
 
 public:
-	inline LRESULT WINAPI AppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { return ::DefWindowProc(hWnd, msg, wParam, lParam); }
+	LRESULT WINAPI AppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 };
 

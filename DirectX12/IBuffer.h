@@ -2,16 +2,30 @@
 
 #include "GraphicsPipeline.h"
 #include "DefineUtility.h"
-
-#include <windows.h>
-#include <wrl/client.h>
-#include <d3d12.h>
-#include "directx/d3dx12.h"
+#include "d3dx12.h"
 
 template<typename T>
 class IBuffer
 {
 public:
+	IBuffer();
+	virtual ~IBuffer();
+
+public:
+	virtual size_t GetBufferSize() = 0;
+	virtual D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress() = 0;
+
+public:
 	virtual void Upload() = 0;
 	virtual void Download() = 0;
 };
+
+template<typename T>
+IBuffer<T>::IBuffer()
+{
+}
+
+template<typename T>
+IBuffer<T>::~IBuffer()
+{
+}

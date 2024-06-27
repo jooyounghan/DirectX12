@@ -5,7 +5,8 @@
 using namespace std;
 using namespace DirectX;
 
-Viewable::Viewable(const float& WidthIn, const float& HeightIn)
+Viewable::Viewable(ID3D12Device* Device, const float& WidthIn, const float& HeightIn)
+	: ViewBuffer(Device)
 {
 	Resize(WidthIn, HeightIn);
 }

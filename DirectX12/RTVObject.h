@@ -2,19 +2,19 @@
 #include <windows.h>
 #include <wrl/client.h>
 #include <d3d12.h>
-#include "directx/d3dx12.h"
 
 class RTVObject
 {
 public:
 	RTVObject(
-		ID3D12Resource* pResource,
-		DXGI_FORMAT FormatIn,
-		D3D12_RTV_DIMENSION ViewDimensionIn
+		ID3D12Device* Device,
+		UINT ResourceCount,
+		ID3D12Resource** Resources
 	);
 	~RTVObject();
 
 public:
-	D3D12_CPU_DESCRIPTOR_HANDLE RTVHandle;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> HeapDescriptor;
+	UINT RTVDescriptorSize = 0;
 };
 
