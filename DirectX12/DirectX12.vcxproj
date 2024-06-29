@@ -136,7 +136,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantArrayBuffer.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="FrontEnd.cpp" />
+    <ClCompile Include="EditorWorld.cpp" />
     <ClCompile Include="IDialog.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -145,7 +145,9 @@
     <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="IWorld.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="RenderObject.cpp" />
     <ClCompile Include="ResourceObject.cpp" />
     <ClCompile Include="RTVObject.cpp" />
@@ -167,7 +169,7 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DefineUtility.h" />
     <ClInclude Include="DefineErrorCode.h" />
-    <ClInclude Include="FrontEnd.h" />
+    <ClInclude Include="EditorWorld.h" />
     <ClInclude Include="IDialog.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -177,7 +179,9 @@
     <ClInclude Include="ImGui\imstb_rectpack.h" />
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
-    <ClInclude Include="Level.h" />
+    <ClInclude Include="GameWorld.h" />
+    <ClInclude Include="IWorld.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="RenderObject.h" />
     <ClInclude Include="ResourceObject.h" />
     <ClInclude Include="RTVObject.h" />

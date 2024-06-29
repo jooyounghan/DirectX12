@@ -55,12 +55,6 @@
     <Filter Include="헤더 파일\Resources\View">
       <UniqueIdentifier>{d20f9ef9-fd52-4d30-b889-18cb8377f3aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\FrontEnd">
-      <UniqueIdentifier>{ce7469a8-40f5-409c-ac04-41101e4d625d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\FrontEnd">
-      <UniqueIdentifier>{8c89cba4-d647-4ecc-bc0e-ae5fa0659977}</UniqueIdentifier>
-    </Filter>
     <Filter Include="소스 파일\ThirdParty">
       <UniqueIdentifier>{f96ae454-43b4-482e-9e26-d85071763f55}</UniqueIdentifier>
     </Filter>
@@ -73,37 +67,55 @@
     <Filter Include="소스 파일\ThirdParty\ImGui">
       <UniqueIdentifier>{ce087a27-bfb7-4d56-b9a3-1eddd1c4e320}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\FrontEnd\DIalog">
-      <UniqueIdentifier>{2ce10098-b475-4e98-8a51-6fc547d99c19}</UniqueIdentifier>
+    <Filter Include="헤더 파일\World">
+      <UniqueIdentifier>{ce7469a8-40f5-409c-ac04-41101e4d625d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\FrontEnd\Dialog">
+    <Filter Include="헤더 파일\World\EditorWorld">
+      <UniqueIdentifier>{6b8805fe-1a2e-432f-9889-35478b34aa10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\World\EditorWorld\Dialog">
       <UniqueIdentifier>{95d035eb-e8c6-4565-ab59-a10022455550}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\FrontEnd\Dialog\Viewport">
+    <Filter Include="헤더 파일\World\EditorWorld\Dialog\Viewport">
       <UniqueIdentifier>{761132a6-341e-4854-9994-80e40b7bf634}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\FrontEnd\DIalog\Viewport">
+    <Filter Include="소스 파일\World">
+      <UniqueIdentifier>{8c89cba4-d647-4ecc-bc0e-ae5fa0659977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\World\EditorWorld">
+      <UniqueIdentifier>{66700006-bc16-4610-a7e5-e879ac404bd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\World\EditorWorld\DIalog">
+      <UniqueIdentifier>{2ce10098-b475-4e98-8a51-6fc547d99c19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\World\EditorWorld\DIalog\Viewport">
       <UniqueIdentifier>{19a1db52-17bc-430b-853f-88d73cb81d3e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="소스 파일\FrontEnd\DIalog\Viewport\Level">
-      <UniqueIdentifier>{55497c7d-e121-4124-b2c9-a5a944e3449f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\FrontEnd\DIalog\Viewport\Level\Object">
-      <UniqueIdentifier>{5090f31e-885c-42e4-bab8-1ca492321af0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일\FrontEnd\DIalog\Viewport\Level\Object\View">
-      <UniqueIdentifier>{6228785a-676d-4fa2-b970-4f6c9b18e1e1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="헤더 파일\FrontEnd\Dialog\Viewport\Level">
+    <Filter Include="헤더 파일\World\GameWorld">
       <UniqueIdentifier>{b4887026-652c-454f-b418-8c62638309ae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\FrontEnd\Dialog\Viewport\Level\Object">
+    <Filter Include="소스 파일\World\GameWorld">
+      <UniqueIdentifier>{55497c7d-e121-4124-b2c9-a5a944e3449f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\World\GameWorld\Map">
+      <UniqueIdentifier>{8e565dbb-1273-4fcf-8645-0d490ff12997}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\World\GameWorld\Map\Object">
+      <UniqueIdentifier>{5090f31e-885c-42e4-bab8-1ca492321af0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\World\GameWorld\Map\Object\View">
+      <UniqueIdentifier>{6228785a-676d-4fa2-b970-4f6c9b18e1e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\World\GameWorld\Map">
+      <UniqueIdentifier>{0083fbf1-59e0-4f4e-b7b7-015ec3017982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\World\GameWorld\Map\Object">
       <UniqueIdentifier>{9ddf5e44-37d4-4847-bbdb-24836ae8a434}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\FrontEnd\Dialog\Viewport\Level\Object\View">
+    <Filter Include="헤더 파일\World\GameWorld\Map\Object\View">
       <UniqueIdentifier>{6a148344-0268-4c0a-829a-15a5afdbe8fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="헤더 파일\FrontEnd\Dialog\Viewport\Level\Object\RederObject">
+    <Filter Include="헤더 파일\World\GameWorld\Map\Object\RederObject">
       <UniqueIdentifier>{29379195-e3cf-4340-8b7e-7582fd15ab90}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -121,13 +133,13 @@
       <Filter>소스 파일\App</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog\Viewport\Level\Object</Filter>
+      <Filter>소스 파일\World\GameWorld\Map\Object</Filter>
     </ClCompile>
     <ClCompile Include="Viewable.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog\Viewport\Level\Object\View</Filter>
+      <Filter>소스 파일\World\GameWorld\Map\Object\View</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog\Viewport\Level\Object\View</Filter>
+      <Filter>소스 파일\World\GameWorld\Map\Object\View</Filter>
     </ClCompile>
     <ClCompile Include="UploadBuffer.cpp">
       <Filter>소스 파일\Resources\Buffer\Extended</Filter>
@@ -151,13 +163,7 @@
       <Filter>소스 파일\Resources\Buffer\Extended</Filter>
     </ClCompile>
     <ClCompile Include="RenderObject.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog\Viewport\Level\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog\Viewport\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="FrontEnd.cpp">
-      <Filter>소스 파일\FrontEnd</Filter>
+      <Filter>소스 파일\World\GameWorld\Map\Object</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
       <Filter>소스 파일\ThirdParty\ImGui</Filter>
@@ -181,13 +187,25 @@
       <Filter>소스 파일\ThirdParty\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="IDialog.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog</Filter>
+      <Filter>소스 파일\World\EditorWorld\DIalog</Filter>
     </ClCompile>
     <ClCompile Include="ViewportDialog.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog\Viewport</Filter>
+      <Filter>소스 파일\World\EditorWorld\DIalog\Viewport</Filter>
     </ClCompile>
     <ClCompile Include="TaskAnalyzerDialog.cpp">
-      <Filter>소스 파일\FrontEnd\DIalog</Filter>
+      <Filter>소스 파일\World\EditorWorld\DIalog</Filter>
+    </ClCompile>
+    <ClCompile Include="GameWorld.cpp">
+      <Filter>소스 파일\World\GameWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorWorld.cpp">
+      <Filter>소스 파일\World\EditorWorld</Filter>
+    </ClCompile>
+    <ClCompile Include="IWorld.cpp">
+      <Filter>소스 파일\World</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>소스 파일\World\GameWorld\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -204,16 +222,16 @@
       <Filter>헤더 파일\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
-      <Filter>헤더 파일\FrontEnd\Dialog\Viewport\Level\Object</Filter>
+      <Filter>헤더 파일\World\GameWorld\Map\Object</Filter>
     </ClInclude>
     <ClInclude Include="HeaderHelper.h">
       <Filter>헤더 파일\Utility</Filter>
     </ClInclude>
     <ClInclude Include="Viewable.h">
-      <Filter>헤더 파일\FrontEnd\Dialog\Viewport\Level\Object\View</Filter>
+      <Filter>헤더 파일\World\GameWorld\Map\Object\View</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>헤더 파일\FrontEnd\Dialog\Viewport\Level\Object\View</Filter>
+      <Filter>헤더 파일\World\GameWorld\Map\Object\View</Filter>
     </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
       <Filter>헤더 파일\Resources\Buffer\Extended</Filter>
@@ -243,13 +261,10 @@
       <Filter>헤더 파일\Resources\Buffer\Extended</Filter>
     </ClInclude>
     <ClInclude Include="RenderObject.h">
-      <Filter>헤더 파일\FrontEnd\Dialog\Viewport\Level\Object</Filter>
+      <Filter>헤더 파일\World\GameWorld\Map\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>헤더 파일\FrontEnd\Dialog\Viewport\Level</Filter>
-    </ClInclude>
-    <ClInclude Include="FrontEnd.h">
-      <Filter>헤더 파일\FrontEnd</Filter>
+    <ClInclude Include="GameWorld.h">
+      <Filter>헤더 파일\World\GameWorld</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
       <Filter>헤더 파일\ThirdParty\ImGui</Filter>
@@ -276,13 +291,22 @@
       <Filter>헤더 파일\ThirdParty\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="IDialog.h">
-      <Filter>헤더 파일\FrontEnd\Dialog</Filter>
+      <Filter>헤더 파일\World\EditorWorld\Dialog</Filter>
     </ClInclude>
     <ClInclude Include="ViewportDialog.h">
-      <Filter>헤더 파일\FrontEnd\Dialog\Viewport</Filter>
+      <Filter>헤더 파일\World\EditorWorld\Dialog\Viewport</Filter>
     </ClInclude>
     <ClInclude Include="TaskAnalyzerDialog.h">
-      <Filter>헤더 파일\FrontEnd\Dialog</Filter>
+      <Filter>헤더 파일\World\EditorWorld\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorWorld.h">
+      <Filter>헤더 파일\World\EditorWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="IWorld.h">
+      <Filter>헤더 파일\World</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>헤더 파일\World\GameWorld\Map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

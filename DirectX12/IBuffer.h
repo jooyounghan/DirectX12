@@ -1,15 +1,18 @@
 #pragma once
 
 #include "GraphicsPipeline.h"
+#include "DefineErrorCode.h"
 #include "DefineUtility.h"
-#include "d3dx12.h"
 
 template<typename T>
 class IBuffer
 {
 public:
-	IBuffer();
+	IBuffer(ID3D12Device* Device);
 	virtual ~IBuffer();
+
+protected:
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CBVHeapDescriptor;
 
 public:
 	virtual size_t GetBufferSize() = 0;
@@ -21,8 +24,13 @@ public:
 };
 
 template<typename T>
-IBuffer<T>::IBuffer()
+IBuffer<T>::IBuffer(ID3D12Device* Device)
 {
+	D3D12_DESCRIPTOR_HEAP_DESC CBVHeapDesc = {};
+	CBVHeapDesc.NumDescriptors = 1;
+	CBVHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+	CBVHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+	ExitIfFailed(CREATE_HEAP_DESCRIPTOR_FAILED, Device->CreateDescriptorHeap(&CBVHeapDesc, IID_PPV_ARGS(CBVHeapDescriptor.GetAddressOf())));
 }
 
 template<typename T>

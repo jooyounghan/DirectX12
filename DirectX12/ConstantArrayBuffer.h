@@ -24,7 +24,6 @@ public:
 
 protected:
 	ResourceObject GPUData;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CBVHeapDescriptor;
 	CD3DX12_HEAP_PROPERTIES GPUHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
 protected:
@@ -52,7 +51,7 @@ inline ConstantArrayBuffer<T>::ConstantArrayBuffer(
 	ID3D12Device* Device,
 	ID3D12GraphicsCommandList* CommandList
 )
-	: IBuffer<T>(), CPUData(CPUDataIn), GPUData(D3D12_RESOURCE_STATE_COMMON), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
+	: IBuffer<T>(Device), CPUData(CPUDataIn), GPUData(D3D12_RESOURCE_STATE_COMMON), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
 {
 	InitBuffer(Device, CommandList);
 }
@@ -63,7 +62,7 @@ inline ConstantArrayBuffer<T>::ConstantArrayBuffer(
 	ID3D12Device* Device,
 	ID3D12GraphicsCommandList* CommandList
 )
-	: IBuffer<T>(), CPUData(CPUDataIn), GPUData(D3D12_RESOURCE_STATE_COMMON), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
+	: IBuffer<T>(Device), CPUData(CPUDataIn), GPUData(D3D12_RESOURCE_STATE_COMMON), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
 {
 	InitBuffer(Device, CommandList);
 }
@@ -76,7 +75,7 @@ inline ConstantArrayBuffer<T>::~ConstantArrayBuffer()
 template<typename T>
 inline size_t ConstantArrayBuffer<T>::GetBufferSize() 
 { 
-	return CPUData.size() * sizeof(T); 
+	return  (CPUData.size() * sizeof(T) + 255) & ~255;
 }
 
 template<typename T>
@@ -115,7 +114,7 @@ inline void ConstantArrayBuffer<T>::InitBuffer(
 	CBVDesc.SizeInBytes = GetBufferSize();
 
 	GraphicsPipeline::GPipeline->Device->CreateConstantBufferView(
-		&CBVDesc, CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
+		&CBVDesc, this->CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
 	);
 
 	UINT8* pStagingBufferView;

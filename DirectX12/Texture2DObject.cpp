@@ -51,6 +51,7 @@ Texture2DObject::Texture2DObject(
 
 	D3D12_CLEAR_VALUE ClearValue;
 	AutoZeroMemory(ClearValue);
+	ClearValue.Format = FormatIn;
 	ClearValue.Color[0] = 0.f;
 	ClearValue.Color[1] = 0.f;
 	ClearValue.Color[2] = 0.f;

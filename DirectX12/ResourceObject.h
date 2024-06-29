@@ -14,8 +14,8 @@ public:
     Microsoft::WRL::ComPtr<ID3D12Resource> Resource;
 
 protected:
-    D3D12_RESOURCE_STATES InitialState;
-    D3D12_RESOURCE_STATES CurrentState;
+    D3D12_RESOURCE_STATES InitialState = D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_COMMON;
+    D3D12_RESOURCE_STATES CurrentState = D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_COMMON;
     MakeGetter(CurrentState);
 
 public:

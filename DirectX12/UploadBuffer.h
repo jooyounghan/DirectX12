@@ -14,7 +14,6 @@ public:
 
 protected:
 	ResourceObject GPUData;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CBVHeapDescriptor;
 
 public:
 	virtual size_t GetBufferSize() override;
@@ -31,7 +30,7 @@ public:
 
 template<typename T>
 inline UploadBuffer<T>::UploadBuffer(ID3D12Device* Device)
-	: IBuffer<T>(), CPUData(), GPUData(D3D12_RESOURCE_STATE_GENERIC_READ)
+	: IBuffer<T>(Device), CPUData(), GPUData(D3D12_RESOURCE_STATE_GENERIC_READ)
 {
 	Device->CreateCommittedResource(
 		&HeapProperties,
@@ -48,7 +47,7 @@ inline UploadBuffer<T>::UploadBuffer(ID3D12Device* Device)
 	CBVDesc.SizeInBytes = GetBufferSize();
 
 	Device->CreateConstantBufferView(
-		&CBVDesc, CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
+		&CBVDesc, this->CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
 	);
 }
 
@@ -60,7 +59,7 @@ inline UploadBuffer<T>::~UploadBuffer()
 template<typename T>
 inline size_t UploadBuffer<T>::GetBufferSize()
 {
-	return sizeof(CPUData);
+	return  (sizeof(CPUData) + 255) & ~255;
 }
 
 template<typename T>

@@ -1,16 +1,16 @@
 #pragma once
 #include "IDialog.h"
 
-#include "d3d12.h"
+class GameWorld;
 
 class ViewportDialog : public IDialog
 {
 public: 
-	ViewportDialog(D3D12_GPU_DESCRIPTOR_HANDLE GPUHandle);
+	ViewportDialog(GameWorld* GameWorldLinkedIn);
 	virtual ~ViewportDialog();
 
 protected:
-	D3D12_GPU_DESCRIPTOR_HANDLE Handle;
+	GameWorld* GameWorldLinked = nullptr;
 
 public:
 	virtual void DoModal(ID3D12Device* Device, ID3D12GraphicsCommandList* CommandList);

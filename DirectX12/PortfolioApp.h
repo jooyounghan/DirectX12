@@ -6,7 +6,8 @@
 #include <memory>
 
 class GraphicsPipeline;
-class FrontEnd;
+class EditorWorld;
+class GameWorld;
 
 class PortfolioApp
 {
@@ -22,22 +23,31 @@ protected:
 	HWND MainWindow;
 
 protected:
-	std::unique_ptr<GraphicsPipeline>	GraphicsPipelineInstance;
-	std::unique_ptr<FrontEnd>			FrontEndInstance;
+	LARGE_INTEGER Frequency;
+	LARGE_INTEGER PrevTime;
 
 protected:
-	UINT Width;
-	UINT Height;
+	std::unique_ptr<GraphicsPipeline>	GraphicsPipelineInstance;
+	std::unique_ptr<GameWorld>				GameWorldInstance;
+
+#ifdef _DEBUG
+	std::unique_ptr<EditorWorld>			EditorWorldInstance;
+#endif 
+
+protected:
+	UINT Width = 1280;
+	UINT Height = 960;
 
 public:
 	void Init();
 	void Run();
+	void Quit();
 
 protected:
 	void Render();
 
-public:
-	void Quit();
+private:
+	float GetDeltaTimeFromLastCall();
 
 public:
 	LRESULT WINAPI AppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

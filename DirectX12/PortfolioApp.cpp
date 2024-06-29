@@ -1,9 +1,15 @@
 #include "PortfolioApp.h"
 #include "GlobalVariable.h"
-#include "GraphicsPipeline.h"
 #include "DefineUtility.h"
 #include "DefineErrorCode.h"
-#include "FrontEnd.h"
+
+#include "GraphicsPipeline.h"
+#include "GameWorld.h"
+
+#ifdef _DEBUG
+#include "EditorWorld.h"
+#endif 
+
 
 using namespace std;
 
@@ -47,6 +53,9 @@ PortfolioApp::PortfolioApp()
 	Width = MonitorInfo.rcWork.right - MonitorInfo.rcWork.left;
 	Height = MonitorInfo.rcWork.bottom - MonitorInfo.rcWork.top;
 
+	Graphics::GWidth = Width;
+	Graphics::GHeight = Height;
+
 	SetWindowPos(MainWindow, NULL, 0, 0, Width, Height, SWP_SHOWWINDOW | SWP_NOMOVE);
 	UpdateWindow(MainWindow);
 }
@@ -59,28 +68,19 @@ PortfolioApp::~PortfolioApp()
 
 void PortfolioApp::Init()
 {
+	QueryPerformanceFrequency(&Frequency);
+	QueryPerformanceCounter(&PrevTime);
+
 	GraphicsPipelineInstance = make_unique<GraphicsPipeline>();
 	GraphicsPipelineInstance->LoadPipeline(Width, Height);
 
-	FrontEndInstance = make_unique<FrontEnd>(GraphicsPipelineInstance->Device.Get());
-	FrontEndInstance->Init(MainWindow);
-}
+	GameWorldInstance = make_unique<GameWorld>(GraphicsPipelineInstance->Device.Get());
+	GameWorldInstance->LoadGameWorld();
 
-void PortfolioApp::Render()
-{
-	const UINT& FrameIndex = GraphicsPipelineInstance->GetFrameIndex();
-
-	GraphicsPipelineInstance->PrepareRender();
-
-	FrontEndInstance->Render(
-		FrameIndex,
-		GraphicsPipelineInstance->BackBufferTextures[FrameIndex].get(),
-		GraphicsPipelineInstance->BackBufferRTVs.get(),
-		GraphicsPipelineInstance->CommandList.Get()
-	);
-
-	GraphicsPipelineInstance->ExecuteRender();
-
+#ifdef _DEBUG
+	EditorWorldInstance = make_unique<EditorWorld>(GraphicsPipelineInstance->Device.Get(), GameWorldInstance.get());
+	EditorWorldInstance->Init(MainWindow);
+#endif 
 }
 
 void PortfolioApp::Run()
@@ -105,10 +105,51 @@ void PortfolioApp::Quit()
 {
 }
 
+void PortfolioApp::Render()
+{
+	const float& DeltaTime = GetDeltaTimeFromLastCall();
+	const UINT& FrameIndex = GraphicsPipelineInstance->GetFrameIndex();
+
+	GraphicsPipelineInstance->PrepareRender();
+
+	GameWorldInstance->UpdateGameWorld(DeltaTime);
+
+#ifdef _DEBUG
+	EditorWorldInstance->DrawToBackBuffer(
+		FrameIndex,
+		GraphicsPipelineInstance->BackBufferTextures[FrameIndex].get(),
+		GraphicsPipelineInstance->BackBufferRTVs.get(),
+		GraphicsPipelineInstance->CommandList.Get()
+	);
+#elif
+	GameWorld->DrawToBackBuffer(
+		FrameIndex,
+		GraphicsPipelineInstance->BackBufferTextures[FrameIndex].get(),
+		GraphicsPipelineInstance->BackBufferRTVs.get(),
+		GraphicsPipelineInstance->CommandList.Get()
+	);
+#endif
+
+	GraphicsPipelineInstance->ExecuteRender();
+}
+
+float PortfolioApp::GetDeltaTimeFromLastCall()
+{
+	LARGE_INTEGER CurrentTime;
+	QueryPerformanceCounter(&CurrentTime);
+
+	LONGLONG Elapsed = CurrentTime.QuadPart - PrevTime.QuadPart;
+	const float DeltaTime = static_cast<float>(Elapsed) / Frequency.QuadPart;
+
+	PrevTime = CurrentTime;
+	return DeltaTime;
+}
+
+
 
 LRESULT __stdcall PortfolioApp::AppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (FrontEndInstance.get() && FrontEndInstance->FrontEndProc(hWnd, msg, wParam, lParam))
+	if (EditorWorldInstance.get() && EditorWorldInstance->EditorWorldProc(hWnd, msg, wParam, lParam))
 		return true;
 
 	switch (msg) 
