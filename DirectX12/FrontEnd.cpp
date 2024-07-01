@@ -26,6 +26,9 @@ FrontEnd::FrontEnd(ID3D12Device* Device)
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\malgun.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesKorean());
+
 #pragma region Font SRV
     D3D12_DESCRIPTOR_HEAP_DESC FontSRVDesc;
     AutoZeroMemory(FontSRVDesc);
