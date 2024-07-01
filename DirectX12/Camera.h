@@ -12,7 +12,7 @@ struct ID3D12GraphicsCommandList;
 class Camera : public Viewable
 {
 public: 
-	Camera(ID3D12Device* Device, const float& WidthIn, const float& HeightIn);
+	Camera(ID3D12Device* Device, const UINT& WidthIn, const UINT& HeightIn);
 	virtual ~Camera();
 
 public:

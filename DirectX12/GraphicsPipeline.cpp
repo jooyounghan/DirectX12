@@ -130,25 +130,12 @@ void GraphicsPipeline::LoadPipeline(const UINT& WidthIn, const UINT& HeightIn)
     BackBufferRTVs = make_unique<RTVObject>(Device.Get(), BackBufferCount, Resources.data());
 #pragma endregion
 
-#pragma region Root Signature
-    CD3DX12_ROOT_SIGNATURE_DESC RootSignatureDesc;
-    RootSignatureDesc.Init(0, nullptr, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-
-    ComPtr<ID3DBlob> signature;
-    ComPtr<ID3DBlob> error;
-    ExitIfFailed(CREATE_ROOT_SIGNATURE_FAILED, D3D12SerializeRootSignature(&RootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &signature, &error));
-    ExitIfFailed(CREATE_ROOT_SIGNATURE_FAILED, Device->CreateRootSignature(
-        0, signature->GetBufferPointer(), signature->GetBufferSize(),
-        IID_PPV_ARGS(RootSignature.GetAddressOf()))
-    );
-#pragma endregion
-
 #pragma region Command List
     ExitIfFailed(CREATE_COMMAND_LIST_FAILED, Device->CreateCommandList(
         0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandAllocator.Get(),
         nullptr, IID_PPV_ARGS(CommandList.GetAddressOf()))
     );
-    ExitIfFailed(RESET_COMMAND_FAILED, CommandList->Close());
+    //ExitIfFailed(RESET_COMMAND_FAILED, CommandList->Close());
 #pragma endregion
 
 #pragma region Synchronization Object
@@ -165,8 +152,7 @@ void GraphicsPipeline::LoadPipeline(const UINT& WidthIn, const UINT& HeightIn)
 
 void GraphicsPipeline::PrepareRender()
 {
-    ExitIfFailed(RESET_COMMAND_FAILED, CommandAllocator->Reset());
-    ExitIfFailed(RESET_COMMAND_FAILED, CommandList->Reset(CommandAllocator.Get(), PipelineState.Get()));
+
 }
 
 void GraphicsPipeline::ExecuteRender()
@@ -179,6 +165,10 @@ void GraphicsPipeline::ExecuteRender()
     ExitIfFailed(SWAPCHAIIN_PRESENT_FAILED, SwapChain->Present(1, 0));
 
     WaitForPreviousFrame();
+
+
+    ExitIfFailed(RESET_COMMAND_FAILED, CommandAllocator->Reset());
+    ExitIfFailed(RESET_COMMAND_FAILED, CommandList->Reset(CommandAllocator.Get(), nullptr));
 }
 
 void GraphicsPipeline::WaitForPreviousFrame()

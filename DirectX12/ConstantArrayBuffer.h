@@ -23,19 +23,15 @@ public:
 	std::vector<T> CPUData;
 
 protected:
-	ResourceObject GPUData;
-	CD3DX12_HEAP_PROPERTIES GPUHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-protected:
 	ResourceObject StagingResource;
 	CD3DX12_HEAP_PROPERTIES StagingHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 
-public:
-	virtual size_t GetBufferSize() override;
-	virtual D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress() override;;
-
 protected:
 	CD3DX12_RESOURCE_DESC ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(GetBufferSize());
+
+public:
+	virtual size_t GetBufferSize() override;
+	virtual D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress() override;
 
 protected:
 	void InitBuffer(ID3D12Device* Device, ID3D12GraphicsCommandList* CommandList);
@@ -51,7 +47,7 @@ inline ConstantArrayBuffer<T>::ConstantArrayBuffer(
 	ID3D12Device* Device,
 	ID3D12GraphicsCommandList* CommandList
 )
-	: IBuffer<T>(Device), CPUData(CPUDataIn), GPUData(D3D12_RESOURCE_STATE_COMMON), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
+	: IBuffer<T>(Device, D3D12_RESOURCE_STATE_COMMON, D3D12_HEAP_TYPE_DEFAULT), CPUData(CPUDataIn), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
 {
 	InitBuffer(Device, CommandList);
 }
@@ -62,7 +58,7 @@ inline ConstantArrayBuffer<T>::ConstantArrayBuffer(
 	ID3D12Device* Device,
 	ID3D12GraphicsCommandList* CommandList
 )
-	: IBuffer<T>(Device), CPUData(CPUDataIn), GPUData(D3D12_RESOURCE_STATE_COMMON), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
+	: IBuffer<T>(Device, D3D12_RESOURCE_STATE_COMMON, D3D12_HEAP_TYPE_DEFAULT), CPUData(CPUDataIn), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
 {
 	InitBuffer(Device, CommandList);
 }
@@ -81,7 +77,7 @@ inline size_t ConstantArrayBuffer<T>::GetBufferSize()
 template<typename T>
 inline D3D12_GPU_VIRTUAL_ADDRESS ConstantArrayBuffer<T>::GetBufferAddress() 
 { 
-	return GPUData.Resource->GetGPUVirtualAddress();
+	return this->GPUData.Resource->GetGPUVirtualAddress();
 }
 
 template<typename T>
@@ -91,18 +87,18 @@ inline void ConstantArrayBuffer<T>::InitBuffer(
 )
 {
 	Device->CreateCommittedResource(
-		&GPUHeapProperties,
+		&this->GPUHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&ResourceDesc,
-		GPUData.GetCurrentState(),
+		&this->ResourceDesc,
+		this->GPUData.GetCurrentState(),
 		nullptr,
-		IID_PPV_ARGS(GPUData.Resource.GetAddressOf())
+		IID_PPV_ARGS(this->GPUData.Resource.GetAddressOf())
 	);
 
 	Device->CreateCommittedResource(
 		&StagingHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&ResourceDesc,
+		&this->ResourceDesc,
 		StagingResource.GetCurrentState(),
 		nullptr,
 		IID_PPV_ARGS(StagingResource.Resource.GetAddressOf())
@@ -110,8 +106,8 @@ inline void ConstantArrayBuffer<T>::InitBuffer(
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC CBVDesc;
 	AutoZeroMemory(CBVDesc);
-	CBVDesc.BufferLocation = GPUData.Resource->GetGPUVirtualAddress();
-	CBVDesc.SizeInBytes = GetBufferSize();
+	CBVDesc.BufferLocation = this->GPUData.Resource->GetGPUVirtualAddress();
+	CBVDesc.SizeInBytes = static_cast<UINT>(GetBufferSize());
 
 	GraphicsPipeline::GPipeline->Device->CreateConstantBufferView(
 		&CBVDesc, this->CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
@@ -124,10 +120,14 @@ inline void ConstantArrayBuffer<T>::InitBuffer(
 	StagingResource.Resource->Unmap(0, nullptr);
 
 	StagingResource.TransitionState(CommandList, D3D12_RESOURCE_STATE_COPY_SOURCE);
-	GPUData.TransitionState(CommandList, D3D12_RESOURCE_STATE_COPY_DEST);
-	CommandList->CopyBufferRegion(GPUData.Resource.Get(), 0, StagingResource.Resource.Get(), 0, GetBufferSize());
-	GPUData.SetDefaultState(CommandList);
+	this->GPUData.TransitionState(CommandList, D3D12_RESOURCE_STATE_COPY_DEST);
+	CommandList->CopyBufferRegion(this->GPUData.Resource.Get(), 0, StagingResource.Resource.Get(), 0, GetBufferSize());
+	this->GPUData.SetDefaultState(CommandList);
 	StagingResource.SetDefaultState(CommandList);
+
+	this->GPUData.ResourceView.BufferLocation = this->GPUData.Resource->GetGPUVirtualAddress();
+	this->GPUData.ResourceView.StrideInBytes = sizeof(T);
+	this->GPUData.ResourceView.SizeInBytes = CPUData.size() * sizeof(T);
 }
 
 template<typename T>

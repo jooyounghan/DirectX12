@@ -74,7 +74,7 @@ void PortfolioApp::Init()
 	GraphicsPipelineInstance = make_unique<GraphicsPipeline>();
 	GraphicsPipelineInstance->LoadPipeline(Width, Height);
 
-	GameWorldInstance = make_unique<GameWorld>(GraphicsPipelineInstance->Device.Get());
+	GameWorldInstance = make_unique<GameWorld>(GraphicsPipelineInstance->Device.Get(), GraphicsPipelineInstance->CommandList.Get());
 	GameWorldInstance->LoadGameWorld();
 
 #ifdef _DEBUG
@@ -112,7 +112,7 @@ void PortfolioApp::Render()
 
 	GraphicsPipelineInstance->PrepareRender();
 
-	GameWorldInstance->UpdateGameWorld(DeltaTime);
+	GameWorldInstance->UpdateGameWorld(DeltaTime, GraphicsPipelineInstance->CommandList.Get());
 
 #ifdef _DEBUG
 	EditorWorldInstance->DrawToBackBuffer(
@@ -121,8 +121,8 @@ void PortfolioApp::Render()
 		GraphicsPipelineInstance->BackBufferRTVs.get(),
 		GraphicsPipelineInstance->CommandList.Get()
 	);
-#elif
-	GameWorld->DrawToBackBuffer(
+#else
+	GameWorldInstance->DrawToBackBuffer(
 		FrameIndex,
 		GraphicsPipelineInstance->BackBufferTextures[FrameIndex].get(),
 		GraphicsPipelineInstance->BackBufferRTVs.get(),
@@ -149,8 +149,10 @@ float PortfolioApp::GetDeltaTimeFromLastCall()
 
 LRESULT __stdcall PortfolioApp::AppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+#ifdef _DEBUG
 	if (EditorWorldInstance.get() && EditorWorldInstance->EditorWorldProc(hWnd, msg, wParam, lParam))
 		return true;
+#endif
 
 	switch (msg) 
 	{

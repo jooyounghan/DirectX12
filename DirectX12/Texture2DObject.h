@@ -7,7 +7,7 @@ class Texture2DObject : public ResourceObject
 public:
 	Texture2DObject(
 		const UINT64 WidthIn, 
-		const UINT64 HeightIn,
+		const UINT HeightIn,
 		const UINT& ArraySizeIn,
 		const UINT& MipLevelIn,
 		DXGI_FORMAT FormatIn,

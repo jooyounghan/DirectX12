@@ -5,8 +5,8 @@
 using namespace std;
 using namespace DirectX;
 
-Viewable::Viewable(ID3D12Device* Device, const float& WidthIn, const float& HeightIn)
-	: ViewBuffer(Device)
+Viewable::Viewable(ID3D12Device* DeviceIn, const UINT& WidthIn, const UINT& HeightIn)
+	: Object(DeviceIn), ViewBuffer(DeviceIn)
 {
 	Resize(WidthIn, HeightIn);
 }
@@ -15,14 +15,14 @@ Viewable::~Viewable()
 {
 }
 
-void Viewable::Resize(const float& WidthIn, const float& HeightIn)
+void Viewable::Resize(const UINT& WidthIn, const UINT& HeightIn)
 {
 	Width = WidthIn;
 	Height = HeightIn;
 
 	AutoZeroMemory(Viewport);
-	Viewport.Width = WidthIn;
-	Viewport.Height = HeightIn;
+	Viewport.Width = static_cast<FLOAT>(WidthIn);
+	Viewport.Height = static_cast<FLOAT>(HeightIn);
 	Viewport.TopLeftX = 0.f;
 	Viewport.TopLeftY = 0.f;
 	Viewport.MinDepth = 0.f;
@@ -42,7 +42,7 @@ XMMATRIX Viewable::GetPerspectiveViewMatrix()
 	XMVECTOR CurrentUp = XMVector3Rotate(Graphics::DefaultUp, RotationQuat);
 
 	return XMMatrixLookToLH(Position.Position, CurrentForward, CurrentUp) *
-		XMMatrixPerspectiveFovLH(XMConvertToRadians(FovAngle), Width / Height, NearZ, FarZ);
+		XMMatrixPerspectiveFovLH(XMConvertToRadians(FovAngle), static_cast<float>(Width) / Height, NearZ, FarZ);
 }
 
 void Viewable::UpdateView()

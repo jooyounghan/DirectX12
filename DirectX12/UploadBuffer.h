@@ -12,15 +12,11 @@ public:
 public:
 	alignas(256) T CPUData;
 
-protected:
-	ResourceObject GPUData;
-
 public:
 	virtual size_t GetBufferSize() override;
 	virtual D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress() override;
 
 protected:
-	CD3DX12_HEAP_PROPERTIES HeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 	CD3DX12_RESOURCE_DESC ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(GetBufferSize());
 
 public:
@@ -30,25 +26,29 @@ public:
 
 template<typename T>
 inline UploadBuffer<T>::UploadBuffer(ID3D12Device* Device)
-	: IBuffer<T>(Device), CPUData(), GPUData(D3D12_RESOURCE_STATE_GENERIC_READ)
+	: IBuffer<T>(Device, D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_HEAP_TYPE_UPLOAD), CPUData()
 {
 	Device->CreateCommittedResource(
-		&HeapProperties,
+		&this->GPUHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&ResourceDesc,
-		GPUData.GetCurrentState(),
+		&this->ResourceDesc,
+		this->GPUData.GetCurrentState(),
 		nullptr,
-		IID_PPV_ARGS(GPUData.Resource.GetAddressOf())
+		IID_PPV_ARGS(this->GPUData.Resource.GetAddressOf())
 	);
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC CBVDesc;
 	AutoZeroMemory(CBVDesc);
-	CBVDesc.BufferLocation = GPUData.Resource->GetGPUVirtualAddress();
-	CBVDesc.SizeInBytes = GetBufferSize();
+	CBVDesc.BufferLocation = this->GPUData.Resource->GetGPUVirtualAddress();
+	CBVDesc.SizeInBytes = static_cast<UINT>(GetBufferSize());
 
 	Device->CreateConstantBufferView(
 		&CBVDesc, this->CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
 	);
+
+	this->GPUData.ResourceView.BufferLocation = this->GPUData.Resource->GetGPUVirtualAddress();
+	this->GPUData.ResourceView.StrideInBytes = sizeof(T);
+	this->GPUData.ResourceView.SizeInBytes = sizeof(T);
 }
 
 template<typename T>
@@ -65,7 +65,7 @@ inline size_t UploadBuffer<T>::GetBufferSize()
 template<typename T>
 inline D3D12_GPU_VIRTUAL_ADDRESS UploadBuffer<T>::GetBufferAddress() 
 {
-	return GPUData.Resource->GetGPUVirtualAddress(); 
+	return this->GPUData.Resource->GetGPUVirtualAddress();
 }
 
 template<typename T>
@@ -73,9 +73,9 @@ inline void UploadBuffer<T>::Upload()
 {
 	UINT8* pConstantBufferView = nullptr;
 	CD3DX12_RANGE ReadRange(0, 0);
-	GPUData.Resource->Map(0, &ReadRange, reinterpret_cast<void**>(&pConstantBufferView));
+	this->GPUData.Resource->Map(0, &ReadRange, reinterpret_cast<void**>(&pConstantBufferView));
 	memcpy(pConstantBufferView, &CPUData, GetBufferSize());
-	GPUData.Resource->Unmap(0, nullptr);
+	this->GPUData.Resource->Unmap(0, nullptr);
 }
 
 template<typename T>

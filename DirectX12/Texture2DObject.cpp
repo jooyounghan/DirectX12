@@ -6,7 +6,7 @@
 
 Texture2DObject::Texture2DObject(
 	const UINT64 WidthIn,
-	const UINT64 HeightIn,
+	const UINT HeightIn,
 	const UINT& ArraySizeIn,
 	const UINT& MipLevelIn,
 	DXGI_FORMAT FormatIn,
@@ -33,6 +33,8 @@ Texture2DObject::Texture2DObject(
 	if (IsMultiSampled)
 	{
 		D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS MultiSamplingFeature;
+		AutoZeroMemory(MultiSamplingFeature);
+
 		ExitIfFailed(CHECK_FEATURE_SUPPORT_FAILED, GraphicsPipeline::GPipeline->Device->CheckFeatureSupport(
 			D3D12_FEATURE::D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &MultiSamplingFeature, sizeof(MultiSamplingFeature))
 		);

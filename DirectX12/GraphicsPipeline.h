@@ -31,7 +31,7 @@ public:
 
 protected:
 	static const UINT BackBufferCount = 2;
-	UINT FrameIndex;
+	UINT FrameIndex = 0;
 	MakeSetterGetter(FrameIndex);
 
 public:
@@ -48,14 +48,12 @@ public:
 	const enum D3D12_COMMAND_LIST_TYPE CommandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
 public:
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> RootSignature;
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> PipelineState;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> CommandList;
 
 protected:
-	HANDLE FenceEvent;
+	HANDLE FenceEvent = NULL;
 	Microsoft::WRL::ComPtr<ID3D12Fence> Fence;
-	UINT64 FenceValue;
+	UINT64 FenceValue = NULL;
 
 protected:
 	float AspectRatio = 0.f;

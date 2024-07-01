@@ -1,6 +1,7 @@
 #pragma once
 #include <DirectXMath.h>
 #include "HeaderHelper.h"
+#include "UploadBuffer.h"
 
 typedef struct SPosition
 {
@@ -20,23 +21,30 @@ struct SAngle
 	float Pitch, Roll, Yaw;
 };
 
+struct TransformationMatrix
+{
+	DirectX::XMMATRIX TransfomationMat;
+	DirectX::XMMATRIX InvTransfomationMat;
+};
+
+struct ID3D12Device;
 
 class Object
 {
 public:
-	Object();
+	Object(ID3D12Device* DeviceIn);
 	~Object();
 
 protected:
-	SPosition	Position;
+	SPosition	Position = SPosition();
 	MakeGetter(Position);
 
 protected:
-	SScale		Scale;
+	SScale		Scale = SScale();
 	MakeGetter(Scale);
 
 protected:
-	SAngle		Angle;
+	SAngle		Angle = SAngle();
 	MakeGetter(Angle);
 
 public:
@@ -45,7 +53,13 @@ public:
 	inline void SetAngle(const float& PitchIn, const float& RollIn, float& YawIn) { Angle.Pitch = PitchIn; Angle.Roll = RollIn; Angle.Yaw = YawIn; }
 
 public:
+	UploadBuffer<TransformationMatrix> TransformationBuffer;
+
+public:
 	DirectX::XMVECTOR GetRotationQuat();
 	DirectX::XMMATRIX GetTransformation();
+
+public:
+	void UpdateObject();
 };
 

@@ -6,7 +6,7 @@
 #include "SRVObject.h"
 #include "RTVObject.h"
 
-Camera::Camera(ID3D12Device* Device, const float& WidthIn, const float& HeightIn)
+Camera::Camera(ID3D12Device* Device, const UINT& WidthIn, const UINT& HeightIn)
 	: Viewable(Device, WidthIn, HeightIn)
 {
 	Texture2D = std::make_unique<Texture2DObject>(

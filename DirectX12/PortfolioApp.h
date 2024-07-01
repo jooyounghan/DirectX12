@@ -23,8 +23,8 @@ protected:
 	HWND MainWindow;
 
 protected:
-	LARGE_INTEGER Frequency;
-	LARGE_INTEGER PrevTime;
+	LARGE_INTEGER Frequency = LARGE_INTEGER();
+	LARGE_INTEGER PrevTime = LARGE_INTEGER();
 
 protected:
 	std::unique_ptr<GraphicsPipeline>	GraphicsPipelineInstance;

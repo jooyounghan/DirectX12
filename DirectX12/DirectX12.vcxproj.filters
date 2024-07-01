@@ -118,6 +118,12 @@
     <Filter Include="헤더 파일\World\GameWorld\Map\Object\RederObject">
       <UniqueIdentifier>{29379195-e3cf-4340-8b7e-7582fd15ab90}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\World\GameWorld\PSO">
+      <UniqueIdentifier>{31eba00a-02b3-4354-89e8-ff6249509751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\World\GameWorld\PSO">
+      <UniqueIdentifier>{c5b69c68-b49d-4612-b1a4-fcaf35265e7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -206,6 +212,9 @@
     </ClCompile>
     <ClCompile Include="Map.cpp">
       <Filter>소스 파일\World\GameWorld\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="PSOManager.cpp">
+      <Filter>소스 파일\World\GameWorld\PSO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -307,6 +316,9 @@
     </ClInclude>
     <ClInclude Include="Map.h">
       <Filter>헤더 파일\World\GameWorld\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="PSOManager.h">
+      <Filter>헤더 파일\World\GameWorld\PSO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

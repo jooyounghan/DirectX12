@@ -11,12 +11,12 @@ struct ViewBufferData
 class Viewable : public Object
 {
 public:
-	Viewable(ID3D12Device* Device, const float& WidthIn, const float& HeightIn);
+	Viewable(ID3D12Device* DeviceIn, const UINT& WidthIn, const UINT& HeightIn);
 	virtual ~Viewable();
 
 protected:
-	float Width = 0;
-	float Height = 0;
+	UINT Width = 0;
+	UINT Height = 0;
 
 public:
 	D3D12_VIEWPORT	Viewport;
@@ -31,7 +31,7 @@ protected:
 	MakeAddressGetter(FarZ);
 
 public:
-	virtual void Resize(const float& WidthIn, const float& HeightIn);
+	virtual void Resize(const UINT& WidthIn, const UINT& HeightIn);
 	DirectX::XMMATRIX GetPerspectiveViewMatrix();
 
 public:
