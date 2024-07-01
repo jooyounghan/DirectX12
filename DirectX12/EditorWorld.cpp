@@ -1,4 +1,4 @@
-#include "FrontEnd.h"
+#include "EditorWorld.h"
 
 #include "DefineUtility.h"
 #include "DefineErrorCode.h"
@@ -7,6 +7,8 @@
 
 #include "TaskAnalyzerDialog.h"
 #include "ViewportDialog.h" 
+
+#include "GameWorld.h"
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
@@ -18,9 +20,10 @@
 
 using namespace std;
 
-FrontEnd::FrontEnd(ID3D12Device* Device)
+EditorWorld::EditorWorld(ID3D12Device* Device, GameWorld* GameWorldIn)
 {
     DeviceCached = Device;
+    GameWorldLinked = GameWorldIn;
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -41,7 +44,7 @@ FrontEnd::FrontEnd(ID3D12Device* Device)
 
 }
 
-FrontEnd::~FrontEnd()
+EditorWorld::~EditorWorld()
 {
 }
 
@@ -52,7 +55,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(
     LPARAM lParam
 );
 
-void FrontEnd::Init(HWND WindowHandle)
+void EditorWorld::Init(HWND WindowHandle)
 {
     ImGui_ImplWin32_Init(WindowHandle);
     ImGui_ImplDX12_Init(DeviceCached, 1,
@@ -61,15 +64,11 @@ void FrontEnd::Init(HWND WindowHandle)
         FontSRVHeapDescriptor->GetGPUDescriptorHandleForHeapStart()
     );
 
-#ifdef _DEBUG
     Dialogs.push_back(make_unique<TaskAnalyzerDialog>());
-#endif // DEBUG
-
-    Dialogs.push_back(make_unique<ViewportDialog>(FontSRVHeapDescriptor->GetGPUDescriptorHandleForHeapStart()));
-
+    Dialogs.push_back(make_unique<ViewportDialog>(GameWorldLinked));
 }
 
-void FrontEnd::Render(
+void EditorWorld::DrawToBackBuffer(
     UINT FrameIndex,
     Texture2DObject* RenderTargetBaseTexture,
     RTVObject* RenderTargetObject,
@@ -103,7 +102,7 @@ void FrontEnd::Render(
 }
 
 
-LRESULT FrontEnd::FrontEndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT EditorWorld::EditorWorldProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 }

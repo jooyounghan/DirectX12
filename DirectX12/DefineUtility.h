@@ -1,5 +1,6 @@
 #pragma once
-#include <utility>
+#include <windows.h>
+#include <stdio.h>
 
 #define AutoZeroMemory(Object) ZeroMemory(&Object, sizeof(decltype(Object)));
 

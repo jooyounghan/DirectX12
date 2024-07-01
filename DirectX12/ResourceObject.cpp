@@ -1,9 +1,10 @@
 #include "ResourceObject.h"
+#include "DefineUtility.h"
 
 ResourceObject::ResourceObject(D3D12_RESOURCE_STATES InitialStateIn)
     : InitialState(InitialStateIn), CurrentState(InitialStateIn)
 {
-
+    AutoZeroMemory(ResourceView);
 }
 
 ResourceObject::~ResourceObject()

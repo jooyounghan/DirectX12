@@ -8,4 +8,7 @@ namespace Graphics
 	extern DirectX::XMVECTOR DefaultForward;
 	extern DirectX::XMVECTOR DefaultUp;
 	extern DirectX::XMVECTOR DefaultRight;
+
+	extern UINT GWidth;
+	extern UINT GHeight;
 }

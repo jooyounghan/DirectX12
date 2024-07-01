@@ -1,6 +1,5 @@
 #pragma once
 #include "IBuffer.h"
-#include "ResourceObject.h"
 
 template<typename T>
 class ConstantBuffer : public IBuffer<T>
@@ -17,20 +16,15 @@ public:
 	alignas(256) T CPUData;
 
 protected:
-	ResourceObject GPUData;
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CBVHeapDescriptor;
-	CD3DX12_HEAP_PROPERTIES GPUHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-protected:
 	ResourceObject StagingResource;
 	CD3DX12_HEAP_PROPERTIES StagingHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+
+protected:
+	CD3DX12_RESOURCE_DESC ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(GetBufferSize());
 
 public:
 	virtual size_t GetBufferSize() override;
 	virtual D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress() override;
-
-protected:
-	CD3DX12_RESOURCE_DESC ResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(GetBufferSize());
 
 public:
 	virtual void Upload() override;
@@ -43,21 +37,21 @@ inline ConstantBuffer<T>::ConstantBuffer(
 	ID3D12Device* Device,
 	ID3D12GraphicsCommandList* CommandList
 )
-	: IBuffer<T>(), CPUData(CPUDataIn), GPUData(D3D12_RESOURCE_STATE_COMMON), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
+	: IBuffer<T>(Device, D3D12_RESOURCE_STATE_COMMON, D3D12_HEAP_TYPE_DEFAULT), CPUData(CPUDataIn), StagingResource(D3D12_RESOURCE_STATE_GENERIC_READ)
 {
 	Device->CreateCommittedResource(
-		&GPUHeapProperties,
+		&this->GPUHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&ResourceDesc,
-		GPUData.CurrentState,
+		&this->ResourceDesc,
+		this->GPUData.CurrentState,
 		nullptr,
-		IID_PPV_ARGS(GPUData.Resource.GetAddressOf())
+		IID_PPV_ARGS(this->GPUData.Resource.GetAddressOf())
 	);
 
 	Device->CreateCommittedResource(
 		&StagingHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&ResourceDesc,
+		&this->ResourceDesc,
 		StagingResource.CurrentState,
 		nullptr,
 		IID_PPV_ARGS(StagingResource.Resource.GetAddressOf())
@@ -65,11 +59,11 @@ inline ConstantBuffer<T>::ConstantBuffer(
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC CBVDesc;
 	AutoZeroMemory(CBVDesc);
-	CBVDesc.BufferLocation = GPUData->GetGPUVirtualAddress();
+	CBVDesc.BufferLocation = this->GPUData->GetGPUVirtualAddress();
 	CBVDesc.SizeInBytes = GetBufferSize();
 
 	Device->CreateConstantBufferView(
-		&CBVDesc, CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
+		&CBVDesc, this->CBVHeapDescriptor->GetCPUDescriptorHandleForHeapStart()
 	);
 
 	UINT8* pStagingBufferView;
@@ -79,10 +73,14 @@ inline ConstantBuffer<T>::ConstantBuffer(
 	StagingResource->Unmap(0, nullptr);
 
 	StagingResource.TransitionState(CommandList, D3D12_RESOURCE_STATE_COPY_SOURCE);
-	GPUData.TransitionState(CommandList, D3D12_RESOURCE_STATE_COPY_DEST);
-	CommandList->CopyBufferRegion(GPUData.Get(), 0, StagingResource.Get(), 0, GetBufferSize());
-	GPUData.SetDefaultState();
+	this->GPUData.TransitionState(CommandList, D3D12_RESOURCE_STATE_COPY_DEST);
+	CommandList->CopyBufferRegion(this->GPUData.Get(), 0, StagingResource.Get(), 0, GetBufferSize());
+	this->GPUData.SetDefaultState();
 	StagingResource.SetDefaultState();
+
+	this->GPUData.ResourceView.BufferLocation = this->GPUData.Resource->GetGPUVirtualAddress();
+	this->GPUData.ResourceView.StrideInBytes = sizeof(T);
+	this->GPUData.ResourceView.SizeInBytes = sizeof(T);
 }
 
 template<typename T>
@@ -93,13 +91,13 @@ inline ConstantBuffer<T>::~ConstantBuffer()
 template<typename T>
 inline size_t ConstantBuffer<T>::GetBufferSize()
 { 
-	return sizeof(CPUData); 
+	return  (sizeof(CPUData) + 255) & ~255;
 }
 
 template<typename T>
 inline D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer<T>::GetBufferAddress() 
 { 
-	return GPUData.Resource->GetGPUVirtualAddress();
+	return this->GPUData.Resource->GetGPUVirtualAddress();
 }
 
 template<typename T>
